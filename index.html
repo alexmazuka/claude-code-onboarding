@@ -65,6 +65,8 @@ figcaption{font-size:13px;color:var(--muted)}
 .perm .btns{display:flex;gap:6px;flex-wrap:wrap}
 .btn{border-radius:6px;padding:3px 12px;border:1px solid var(--line)}
 .btn.p{background:var(--accent);border-color:var(--accent);color:#fff}
+.shot{border:1px solid var(--line);border-radius:12px;display:block;max-width:100%;height:auto}
+.shots{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;align-items:start}
 .legend{display:grid;gap:4px;font-size:14px;color:var(--muted)}
 @media (max-width:560px){.body{grid-template-columns:1fr}.side{display:none}}
 </style>
@@ -90,9 +92,13 @@ figcaption{font-size:13px;color:var(--muted)}
   <h2>Откройте вкладку Code и выберите папку</h2>
   <ol>
     <li>Откройте приложение Claude для Mac или Windows и войдите в командный аккаунт.</li>
-    <li>Вверху переключитесь с <b>Chat</b> на <b>Code</b> <span class="pin">1</span>.</li>
+    <li>Вверху слева переключитесь с <b>Chat</b> (значок облачка) на <b>Code</b> (значок <code>&lt;/&gt;</code>) <span class="pin">1</span>.</li>
     <li>Нажмите <b>New session</b> <span class="pin">2</span> и выберите рабочую папку проекта <span class="pin">3</span>, например <code>Desktop/operations</code>.</li>
   </ol>
+  <figure>
+    <img class="shot" src="img/code-toggle.png" alt="Переключатель Chat и Code вверху слева, под ним кнопки New и Search" style="max-width:420px">
+    <figcaption>Скриншот: справа кнопка Code (&lt;/&gt;), под ней New — новая сессия.</figcaption>
+  </figure>
   <figure>
     <div class="win">
       <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span>
@@ -133,12 +139,18 @@ figcaption{font-size:13px;color:var(--muted)}
 <section>
   <span class="step">Шаг 3</span>
   <h2>Подтверждайте действия</h2>
-  <p>Перед изменением файлов, отправкой писем или публикацией Claude спрашивает разрешение. Внизу поля ввода можно выбрать режим разрешений:</p>
+  <p>Перед изменением файлов, отправкой писем или публикацией Claude спрашивает разрешение. Режим выбирается кнопкой слева под полем ввода (на скриншоте — <b>Auto</b>):</p>
   <ul>
-    <li><b>Ask</b> — спрашивает каждый раз. Начинайте с него.</li>
-    <li><b>Auto</b> — безопасные действия выполняет сам, рискованные всё равно спрашивает.</li>
+    <li><b>Auto</b> — Claude сам решает: безопасное делает, рискованное спрашивает. Удобный режим на каждый день.</li>
+    <li><b>Manual</b> — спрашивает перед каждым изменением. Начинайте с него, пока осваиваетесь.</li>
+    <li><b>Accept edits</b> — правки файлов принимает без вопросов, остальное спрашивает.</li>
     <li><b>Plan</b> — сначала только план, без изменений, пока вы его не одобрите.</li>
+    <li><b>Bypass permissions</b> — разрешает всё без вопросов. Команде не использовать.</li>
   </ul>
+  <figure>
+    <img class="shot" src="img/modes.png" alt="Меню Mode: Auto, Manual, Accept edits, Plan, Bypass permissions" style="max-width:480px">
+    <figcaption>Скриншот: меню режимов. Цифры 1–5 — быстрые клавиши.</figcaption>
+  </figure>
   <figure>
     <div class="win"><div class="main">
       <div class="perm"><span>Claude хочет создать файл <code>Sales/октябрь-сводка.xlsx</code></span>
@@ -175,6 +187,11 @@ figcaption{font-size:13px;color:var(--muted)}
     <div><h3>Haiku</h3><p>Самая быстрая и экономная. Для простого: переформулировать, разобрать список, короткая сводка.</p></div>
   </div>
   <p class="tip">Правило: начинайте с Sonnet и переключайтесь на Opus, если ответ недостаточно глубокий.</p>
+  <p>В том же меню есть <b>Effort</b> — насколько глубоко модель думает. Выше уровень — тщательнее ответ, но дольше и дороже по лимитам. <b>Medium</b> рекомендован по умолчанию, <b>Low</b> — для простых задач, <b>High/Extra</b> — для сложных. <b>Max</b> тратит лимит в 3,5 раза и больше, включайте только при необходимости. <b>Fast mode</b> ускоряет ответы той же модели.</p>
+  <div class="shots">
+    <figure><img class="shot" src="img/models.png" alt="Меню моделей: Opus 5.5, Sonnet 5.5, Fable 5.1, Haiku 5.5, Effort, Fast mode"><figcaption>Скриншот: выбор модели — кнопка справа под полем ввода.</figcaption></figure>
+    <figure><img class="shot" src="img/effort.png" alt="Подменю Effort: Low, Medium, High, Extra, Max, Ultracode"><figcaption>Скриншот: уровни Effort.</figcaption></figure>
+  </div>
 </section>
 
 <section>
@@ -217,8 +234,13 @@ figcaption{font-size:13px;color:var(--muted)}
     <div class="yes"><h3>Навыки (skills)</h3><p>Готовая инструкция для повторяющейся задачи: шаги, источники, формат результата. Навык делает так, что дайджест или отчёт каждый раз выходит одинаковым по структуре и качеству.</p>
       <p>Как пользоваться: напишите задачу словами («сделай наративы за сегодня»), и Claude сам подберёт навык, или вызовите его через <code>/</code>. Новый навык можно создать, попросив: «сделай из этого навык».</p></div>
     <div class="yes"><h3>Коннекторы</h3><p>Подключения к внешним сервисам: почта, календарь, Google Drive, Notion, Slack, Jira и другие. Через них Claude читает данные и готовит черновики прямо в этих сервисах.</p>
-      <p>Подключаются в <b>Settings → Connectors</b>, вход в сервис делаете вы сами. Письма, публикации и другие действия наружу Claude выполняет только после вашего подтверждения.</p></div>
+      <p>Подключаются в разделе <b>Customize → Connectors</b>, вход в сервис делаете вы сами. Письма, публикации и другие действия наружу Claude выполняет только после вашего подтверждения.</p></div>
   </div>
+  <p>Всё это находится в разделе <b>Customize</b>: вкладки <b>Skills</b> (навыки), <b>Connectors</b> (коннекторы) и <b>Plugins</b> (наборы навыков и коннекторов). Переключатель <b>Yours / Discover</b> показывает уже подключённое и каталог нового.</p>
+  <figure>
+    <img class="shot" src="img/customize.png" alt="Раздел Customize с вкладками Skills, Connectors, Plugins и переключателем Yours/Discover" style="max-width:560px">
+    <figcaption>Скриншот: раздел Customize.</figcaption>
+  </figure>
 </section>
 
 <section>
