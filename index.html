@@ -1,0 +1,212 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Claude Code для команды</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column of steps; each step pairs short text with a drawn "screen" of the app */
+:root{
+  --bg:#f6f5f2; --surface:#ffffff; --fg:#1d1c1a; --muted:#6b675f; --line:#e3dfd6;
+  --accent:#c2552d; --accent-soft:#f6e3da; --app:#faf9f6; --app-side:#efece5; --ok:#2f7a4f;
+  --display:"Unbounded",system-ui,sans-serif; --body:"Golos Text",system-ui,sans-serif; --mono:"JetBrains Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#171614; --surface:#211f1c; --fg:#ecE9e3; --muted:#a29d93; --line:#34312c;
+  --accent:#e2784f; --accent-soft:#3a2820; --app:#1c1b19; --app-side:#26241f; --ok:#6cc093; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#171614; --surface:#211f1c; --fg:#ece9e3; --muted:#a29d93; --line:#34312c;
+  --accent:#e2784f; --accent-soft:#3a2820; --app:#1c1b19; --app-side:#26241f; --ok:#6cc093; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.6}
+.wrap{max-width:860px;margin:0 auto;padding-block:48px 80px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:56px}
+h1,h2{font-family:var(--display);text-wrap:balance;line-height:1.2;margin:0}
+h1{font-size:clamp(28px,5vw,44px);font-weight:700}
+h2{font-size:clamp(20px,3vw,26px);font-weight:500}
+p{margin:0;max-width:65ch}
+.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:600}
+header{display:grid;gap:14px}
+header p{color:var(--muted);font-size:18px}
+section{display:grid;gap:16px}
+.step{font-family:var(--mono);font-size:13px;color:var(--accent)}
+ul,ol{margin:0;padding-left:22px;display:grid;gap:6px;max-width:65ch}
+code,kbd{font-family:var(--mono);font-size:.88em;background:var(--accent-soft);padding:1px 6px;border-radius:4px}
+.cmp{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.cmp>div{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px 20px;display:grid;gap:8px;align-content:start}
+.cmp h3{margin:0;font-size:15px;font-weight:600}
+.cmp .yes{border-color:var(--accent)}
+.tip{border-left:3px solid var(--accent);padding:4px 0 4px 16px;color:var(--muted);max-width:65ch}
+/* drawn app screens */
+figure{margin:0;display:grid;gap:8px}
+figcaption{font-size:13px;color:var(--muted)}
+.win{background:var(--app);border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:0 10px 30px -18px rgba(0,0,0,.35);font-size:13px}
+.bar{display:flex;align-items:center;gap:6px;padding:9px 12px;border-bottom:1px solid var(--line);background:var(--app-side)}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--line)}
+.tabs{margin-left:16px;display:flex;gap:4px}
+.tab{padding:3px 12px;border-radius:6px;color:var(--muted)}
+.tab.on{background:var(--surface);color:var(--fg);font-weight:600;outline:2px solid var(--accent)}
+.body{display:grid;grid-template-columns:170px 1fr;min-height:220px}
+.side{background:var(--app-side);padding:12px;display:grid;gap:6px;align-content:start;border-right:1px solid var(--line)}
+.side .it{padding:5px 8px;border-radius:6px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.side .it.on{background:var(--surface);color:var(--fg)}
+.side .new{background:var(--accent);color:#fff;font-weight:600;text-align:center}
+.main{padding:16px;display:grid;gap:10px;align-content:start;min-width:0}
+.msg{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 12px;max-width:85%}
+.msg.me{justify-self:end;background:var(--accent-soft);border-color:transparent}
+.tool{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.tool b{color:var(--ok);font-weight:500}
+.plan{border:1px solid var(--line);border-radius:8px;padding:8px 12px;display:grid;gap:4px;background:var(--surface)}
+.plan span::before{content:"○ ";color:var(--muted)}
+.plan .d::before{content:"✓ ";color:var(--ok)}
+.input{margin-top:auto;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--surface);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.input .ph{flex:1;color:var(--muted);min-width:140px}
+.chip{border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:12px;color:var(--muted);white-space:nowrap}
+.chip.hl{border-color:var(--accent);color:var(--accent);font-weight:600}
+.callout{position:relative}
+.pin{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:700;font-family:var(--mono);vertical-align:middle}
+.perm{border:1px solid var(--accent);border-radius:8px;padding:10px 12px;background:var(--surface);display:grid;gap:8px}
+.perm .btns{display:flex;gap:6px;flex-wrap:wrap}
+.btn{border-radius:6px;padding:3px 12px;border:1px solid var(--line)}
+.btn.p{background:var(--accent);border-color:var(--accent);color:#fff}
+.legend{display:grid;gap:4px;font-size:14px;color:var(--muted)}
+@media (max-width:560px){.body{grid-template-columns:1fr}.side{display:none}}
+</style>
+
+</head><body>
+<div class="wrap">
+<header>
+  <span class="eyebrow">Онбординг · премиум-аккаунт команды</span>
+  <h1>Как работать в Claude в режиме «Код»</h1>
+  <p>Короткая инструкция для нового участника команды: что такое вкладка Code, чем она лучше обычного чата и как за 10 минут сделать первую задачу.</p>
+</header>
+
+<section>
+  <h2>Чат и Код: в чём разница</h2>
+  <div class="cmp">
+    <div><h3>Обычный чат (Chat)</h3><p>Отвечает текстом. Файлы надо загружать вручную, результат копировать к себе. Хорош для вопросов и черновиков.</p></div>
+    <div class="yes"><h3>Режим Code</h3><p>Claude сам работает в папке на вашем компьютере: читает и создаёт файлы, запускает команды, открывает сайты во встроенном браузере, ведёт план задачи и показывает результат.</p></div>
+  </div>
+</section>
+
+<section>
+  <span class="step">Шаг 1</span>
+  <h2>Откройте вкладку Code и выберите папку</h2>
+  <ol>
+    <li>Откройте приложение Claude для Mac или Windows и войдите в командный аккаунт.</li>
+    <li>Вверху переключитесь с <b>Chat</b> на <b>Code</b> <span class="pin">1</span>.</li>
+    <li>Нажмите <b>New session</b> <span class="pin">2</span> и выберите рабочую папку проекта <span class="pin">3</span>, например <code>Desktop/operations</code>.</li>
+  </ol>
+  <figure>
+    <div class="win">
+      <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <div class="tabs"><span class="tab">Chat</span><span class="tab on">Code <span class="pin">1</span></span></div></div>
+      <div class="body">
+        <div class="side"><div class="it new">+ New session <span class="pin">2</span></div><div class="it on">Дайджест прессы</div><div class="it">Отчёт по Сибиге</div><div class="it">Монтаж ролика</div></div>
+        <div class="main">
+          <div class="plan" style="max-width:340px"><b>Выберите папку проекта</b><div class="chip hl" style="justify-self:start">📁 Desktop/operations <span class="pin">3</span></div><div class="chip" style="justify-self:start">📁 Desktop</div></div>
+        </div>
+      </div>
+    </div>
+    <figcaption>Схема экрана: переключатель Chat/Code, список сессий слева, выбор папки.</figcaption>
+  </figure>
+  <p class="tip">Без папки сессия работает во временной папке и удаляется вместе с сессией. Для постоянной работы всегда выбирайте папку проекта.</p>
+</section>
+
+<section>
+  <span class="step">Шаг 2</span>
+  <h2>Поставьте задачу обычными словами</h2>
+  <p>Пишите как коллеге: что нужно, откуда взять данные, в каком виде результат. Claude составит план <span class="pin">4</span> и будет показывать каждое действие <span class="pin">5</span>.</p>
+  <figure>
+    <div class="win">
+      <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><div class="tabs"><span class="tab on">Code</span></div></div>
+      <div class="body">
+        <div class="side"><div class="it new">+ New session</div><div class="it on">Сводка по таблицам</div></div>
+        <div class="main">
+          <div class="msg me">Возьми все xlsx из папки Sales за октябрь, сведи в одну таблицу и сделай график продаж по неделям</div>
+          <div class="plan"><b>План <span class="pin">4</span></b><span class="d">Найти файлы за октябрь</span><span class="d">Свести данные</span><span>Построить график</span><span>Сохранить итоговый файл</span></div>
+          <div class="tool"><b>✓</b> Read Sales/2026-10-wk1.xlsx<br><b>✓</b> Bash python merge.py <span class="pin">5</span></div>
+          <div class="input"><span class="ph">Ответить или уточнить…</span><span class="chip hl">Opus 5.5</span><span class="chip">Auto</span></div>
+        </div>
+      </div>
+    </div>
+    <figcaption>Схема: запрос, план задачи и журнал действий (чтение файлов, команды).</figcaption>
+  </figure>
+</section>
+
+<section>
+  <span class="step">Шаг 3</span>
+  <h2>Подтверждайте действия</h2>
+  <p>Перед изменением файлов, отправкой писем или публикацией Claude спрашивает разрешение. Внизу поля ввода можно выбрать режим разрешений:</p>
+  <ul>
+    <li><b>Ask</b> — спрашивает каждый раз. Начинайте с него.</li>
+    <li><b>Auto</b> — безопасные действия выполняет сам, рискованные всё равно спрашивает.</li>
+    <li><b>Plan</b> — сначала только план, без изменений, пока вы его не одобрите.</li>
+  </ul>
+  <figure>
+    <div class="win"><div class="main">
+      <div class="perm"><span>Claude хочет создать файл <code>Sales/октябрь-сводка.xlsx</code></span>
+        <div class="btns"><span class="btn p">Разрешить</span><span class="btn">Разрешить всегда</span><span class="btn">Отклонить</span></div></div>
+    </div></div>
+    <figcaption>Схема окна подтверждения.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <span class="step">Шаг 4</span>
+  <h2>Забирайте результат</h2>
+  <p>Готовые файлы появляются в выбранной папке и открываются кликом прямо из чата. Страницы и отчёты Claude может опубликовать как приватный артефакт со ссылкой, которой можно поделиться с командой.</p>
+</section>
+
+<section>
+  <h2>Преимущества премиум-аккаунта в Code</h2>
+  <div class="cmp">
+    <div><h3>Работа с вашими файлами</h3><p>Excel, Word, PDF, видео, папки целиком. Не нужно загружать и скачивать вручную.</p></div>
+    <div><h3>Сильнейшие модели</h3><p>Доступ к Opus для сложных задач и большие лимиты использования.</p></div>
+    <div><h3>Навыки команды</h3><p>Готовые сценарии через <code>/</code>: дайджест прессы, мониторинг персон, наративы, монтаж видео.</p></div>
+    <div><h3>Подключённые сервисы</h3><p>Почта, календарь, Notion, Slack, Google Drive, Jira — Claude читает и готовит черновики.</p></div>
+    <div><h3>Встроенный браузер</h3><p>Сам открывает сайты, собирает информацию, проверяет страницы.</p></div>
+    <div><h3>Параллельные сессии и расписание</h3><p>Несколько задач одновременно и регулярные задачи по расписанию, например утренний дайджест.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>Какую модель выбрать</h2>
+  <p>Модель переключается в поле ввода внизу (чип с названием модели).</p>
+  <div class="cmp">
+    <div class="yes"><h3>Opus</h3><p>Самая умная, быстрее всех расходует лимит. Для сложного анализа, длинных отчётов и многошаговых задач.</p></div>
+    <div><h3>Sonnet</h3><p>Баланс качества и скорости, экономнее Opus. Для большинства повседневных задач.</p></div>
+    <div><h3>Haiku</h3><p>Самая быстрая и экономная. Для простого: переформулировать, разобрать список, короткая сводка.</p></div>
+  </div>
+  <p class="tip">Правило: начинайте с Sonnet и переключайтесь на Opus, если ответ недостаточно глубокий.</p>
+</section>
+
+<section>
+  <h2>Как следить за лимитами</h2>
+  <ul>
+    <li>В приложении или на claude.ai откройте <b>Settings → Usage</b>: там видно, сколько использовано и когда лимит сбросится.</li>
+    <li>Когда лимит подходит к концу, приложение само предупреждает.</li>
+    <li>В терминальной версии <code>claude</code> есть команда <code>/usage</code>.</li>
+    <li>Opus тратит лимит быстрее всех, для рутинных задач берите Sonnet.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Рутины: задачи по расписанию</h2>
+  <ol>
+    <li>Во вкладке Code напишите словами, например: «каждый будний день в 8:00 делай дайджест западной прессы и присылай ссылку».</li>
+    <li>Claude создаст задачу по расписанию. То же можно сделать напрямую командой <code>/schedule</code>.</li>
+    <li>Посмотреть, изменить или удалить рутину: попросите Claude или вызовите <code>/schedule</code>.</li>
+    <li>Чтобы повторять задачу внутри открытой сессии, есть <code>/loop</code>, например <code>/loop 30m проверь почту</code>.</li>
+  </ol>
+  <p class="tip">Ставьте в рутину готовый навык (дайджест, мониторинг персоны), тогда результат каждый раз будет в одном формате.</p>
+</section>
+
+<section>
+  <h2>Правила команды</h2>
+  <ul>
+    <li>Одна задача — одна сессия. Называйте сессии понятно.</li>
+    <li>Не вводите пароли и данные карт в чат — Claude их и не попросит.</li>
+    <li>Проверяйте факты и цифры перед отправкой наружу.</li>
+    <li>Если не уверены, начните с режима <b>Plan</b>.</li>
+    <li>Вопросы по работе Claude можно задать самому Claude: «как сделать в Claude Code…?»</li>
+  </ul>
+</section>
+</div>
+</body></html>
